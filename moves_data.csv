@@ -1,0 +1,13 @@
+Type,Name,Description,ManaCost
+Effect,Strike,A focused damage hit,6
+Effect,Blast,Wide destructive burst,9
+Effect,Drain,Siphon damage into healing,10
+Effect,Venom,Apply poison damage over time,8
+Effect,Mend,Heal yourself instead of attacking,10
+Delivery,Physical,Pure strength based hit,0
+Delivery, Wild, luck-based hit,2
+Delivery, Vital, health-based hit,1
+Modifier,None,No extra effect,0
+Modifier,Piercing,Ignore 75% of enemy armor,2
+Modifier,Vampiric,Heal 40% of damage dealt,3
+Modifier,Stunning,25% chance to stun enemy,2
