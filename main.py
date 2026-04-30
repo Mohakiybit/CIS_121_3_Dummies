@@ -8,31 +8,30 @@ def move_workshop(player):
     
     clear_screen()
     show_divider()
-    print("WELCOME TO THE MOVE WORKSHOP")
+    slow_print("WELCOME TO THE MOVE WORKSHOP")
     show_divider()
 
     # Choice 1: Effect
-    print("\nSelect an Effect:")
+    slow_print("\nSelect an Effect:")
     for index, item in enumerate(effects):
-        print(f"{index + 1}. {item['name']} - {item['desc']}")
+        slow_print(f"{index + 1}. {item['name']} - {item['desc']}")
     effect_choice = effects[int(input("Selection: ")) - 1]
 
     # Choice 2: Delivery
-    print("\nSelect a Delivery Method:")
+    slow_print("\nSelect a Delivery Method:")
     for index, item in enumerate(deliveries):
-        print(f"{index + 1}. {item['name']} - {item['desc']}")
+        slow_print(f"{index + 1}. {item['name']} - {item['desc']}")
     delivery_choice = deliveries[int(input("Selection: ")) - 1]
 
     # Choice 3: Modifier
-    print("\nSelect a Modifier:")
+    slow_print("\nSelect a Modifier:")
     for index, item in enumerate(modifiers):
-        print(f"{index + 1}. {item['name']} - {item['desc']}")
+        slow_print(f"{index + 1}. {item['name']} - {item['desc']}")
     modifier_choice = modifiers[int(input("Selection: ")) - 1]
 
     # Combine move parts
     new_name = f"{modifier_choice['name']} {effect_choice['name']}"
     total_cost = effect_choice['cost'] + delivery_choice['cost'] + modifier_choice['cost']
-    
     new_move = Move(new_name, effect_choice, delivery_choice, modifier_choice, total_cost)
     player.moves.append(new_move)
     
@@ -45,13 +44,13 @@ def start_combat(player, enemy):
     while enemy.is_alive() and player.health_points > 0:
         try:
             player.show_status()
-            print(f"Enemy HP: {enemy.health_points}")
-            print("\nWhat will you do?")
-            print("1. Standard Attack")
+            enemy.show_status()
+            slow_print("\nWhat will you do?")
+            slow_print("1. Standard Attack")
             
             # List custom moves from workshop
             for i, move in enumerate(player.moves):
-                print(f"{i + 2}. Use {move.name} ({move.mana_cost} Mana)")
+                slow_print(f"{i + 2}. Use {move.name} ({move.mana_cost} Mana)")
             
             choice = input("> ")
             
@@ -82,11 +81,11 @@ def start_combat(player, enemy):
                     final_dmg = base_dmg
                     
                     if selected_move.effect['name'] == "Strike":
-                        # Stable damage
+                        # Stable mult
                         final_dmg = int(final_dmg * 1.5)
                     elif selected_move.effect['name'] == "Blast":
-                        # Stable damage
-                        final_dmg = int(final_dmg * random.float(1.25,1.75))
+                        # Random mult
+                        final_dmg = int(final_dmg * random.uniform(1.25,1.75))
                     elif selected_move.effect['name'] == "Drain":
                         # Drain health
                         final_dmg = int(final_dmg * 0.8)
@@ -110,7 +109,8 @@ def start_combat(player, enemy):
                     elif selected_move.modifier['name'] == "Stunning":
                         # 25% chance to stun
                         if random.random() < 0.25:
-                            print(f"STUNNED! The {enemy.name} loses its next turn!")
+                            enemy.is_stunned()
+                            slow_print(f"STUNNED! The {enemy.name} loses its next turn!")
 
                     # Apply final damage to enemy
                     if final_dmg > 0:
@@ -122,8 +122,8 @@ def start_combat(player, enemy):
 
             enemy.health_points -= damage_to_deal
 
-            if enemy.is_alive():
-                enemy_hit = enemy.strength_stat + random.randint(1, 3)
+            if enemy.is_alive() and not enemy.enemy_stun():
+                enemy_hit = (enemy.strength_stat*enemy.low_health() + random.randint(1, 3))
                 player.health_points -= enemy_hit
                 slow_print(f"The {enemy.name} hits you back for {enemy_hit}!")
         except IndexError:
@@ -139,12 +139,11 @@ def main():
     name = input("Hero Name: ")
     
     user = Player(name)
-    
     # First, go to the workshop
     move_workshop(user)
     
     # Simple enemy list
-    monsters = [Enemy("Slime", 60, 2), Enemy("Orc", 80, 6), Enemy("Goblin", 70, 4), Enemy("Demon King", 100, 10)]
+    monsters = (Enemy("Slime", 60, 2), Enemy("Orc", 80, 6), Enemy("Goblin", 70, 4), Enemy("Demon King", 100, 10))
     #Combat loop
     for monster in monsters:
         if monster.name == "Demon King":
@@ -152,13 +151,15 @@ def main():
             if not start_combat(user, monster):
                 slow_print("Game Over...")
                 break
-            slow_print("You win!")
+            slow_print("You won the game!")
         if not start_combat(user, monster):
             slow_print("Game Over...")
             break
+        user.level_up()
         user.restore()
+        slow_print("You win!")
         move_workshop(user)
-        print("\nYou move deeper...")
+        slow_print("\nYou move deeper...")
 
 if __name__ == "__main__":
     main()
